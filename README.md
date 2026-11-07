@@ -58,20 +58,37 @@ credentials, or register a brand-new account from the Register page (note:
 Industry Partner accounts require University Admin approval before they can log in —
 approve them from the University Admin → Partner Verification tab).
 
-## 🗂 Project structure (flat — all files in one folder)
+## 🗂 Project structure
 
 ```
-index.html, package.json, vite.config.js, tailwind.config.js, postcss.config.js
-main.jsx, App.jsx, index.css
-seed.js, DataContext.jsx, AuthContext.jsx
-DashboardShell.jsx, WorkspaceHeader.jsx, NotificationBell.jsx, UI.jsx
-Login.jsx, Register.jsx
-Student:    StudentDashboard, PartnerFinderTab, StudyHubTab, BazaarTab, EventsTab, CareersTab
-Faculty:    FacultyDashboard, VettingTab, MetricsTab, AdvisoryTab
-Club:       ClubDashboard, EventLifecycleTab, RosterTab
-Partner:    PartnerDashboard, JobsTab, TalentSearchTab
-Uni Admin:  UniAdminDashboard, BulletinTab, AnalyticsTab, PartnerVerificationTab
-Sys Admin:  SysAdminDashboard, UsersTab, ModerationTab, SystemHealthTab
+Campus-Noba/
+├── index.html
+├── package.json
+├── vite.config.js
+├── tailwind.config.js
+├── postcss.config.js
+└── src/
+    ├── main.jsx                 # App entry point
+    ├── App.jsx                  # Routes
+    ├── index.css                # Tailwind + global styles
+    ├── context/
+    │   ├── AuthContext.jsx
+    │   └── DataContext.jsx
+    ├── data/
+    │   └── seed.js              # Demo seed data
+    ├── components/              # Shared UI
+    │   ├── DashboardShell.jsx
+    │   ├── WorkspaceHeader.jsx
+    │   ├── NotificationBell.jsx
+    │   └── UI.jsx
+    └── pages/
+        ├── auth/        Login, Register
+        ├── student/     StudentDashboard, PartnerFinderTab, StudyHubTab, BazaarTab, EventsTab, CareersTab
+        ├── faculty/     FacultyDashboard, VettingTab, MetricsTab, AdvisoryTab
+        ├── club/        ClubDashboard, EventLifecycleTab, RosterTab
+        ├── partner/     PartnerDashboard, JobsTab, TalentSearchTab
+        ├── uni-admin/   UniAdminDashboard, BulletinTab, AnalyticsTab, PartnerVerificationTab
+        └── sys-admin/   SysAdminDashboard, UsersTab, ModerationTab, SystemHealthTab
 ```
 
 ## Resetting demo data
