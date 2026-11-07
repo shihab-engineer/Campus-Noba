@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Send, Megaphone, AlertTriangle } from 'lucide-react'
 import { useData } from '../../context/DataContext.jsx'
 import { SectionTitle, EmptyState, Badge } from '../../components/UI.jsx'
+import { today } from '../../utils/date.js'
 
 export default function BulletinTab() {
   const { db, addItem } = useData()
@@ -12,7 +13,7 @@ export default function BulletinTab() {
   function send(e) {
     e.preventDefault()
     if (!title.trim() || !body.trim()) return
-    addItem('broadcasts', { title, body, priority, postedAt: new Date().toISOString().slice(0, 10) })
+    addItem('broadcasts', { title, body, priority, postedAt: today() })
     const audience = db.users.filter(u => u.role !== 'sys_admin' && u.role !== 'uni_admin')
     audience.forEach(u => addItem('notifications', { userId: u.id, title: `${priority === 'urgent' ? '🚨 URGENT: ' : ''}${title}`, body, time: 'just now', read: false, icon: 'megaphone' }))
     setTitle(''); setBody('')

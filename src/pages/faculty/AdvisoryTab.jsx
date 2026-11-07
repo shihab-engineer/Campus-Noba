@@ -4,21 +4,25 @@ import { useData } from '../../context/DataContext.jsx'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { COURSES } from '../../data/seed.js'
 import { SectionTitle, EmptyState } from '../../components/UI.jsx'
+import { today } from '../../utils/date.js'
 
 export default function AdvisoryTab() {
   const { db, addItem } = useData()
   const { currentUser } = useAuth()
   const [courseCode, setCourseCode] = useState(COURSES[0].code)
   const [message, setMessage] = useState('')
+  const [sentInfo, setSentInfo] = useState('')
   const notices = db.broadcasts.filter(b => b.authorId === currentUser.id)
 
   function send(e) {
     e.preventDefault()
     if (!message.trim()) return
-    addItem('broadcasts', { title: `${courseCode} Class Notice`, body: message, priority: 'normal', authorId: currentUser.id, postedAt: new Date().toISOString().slice(0, 10) })
-    const students = db.users.filter(u => u.role === 'student')
+    addItem('broadcasts', { title: `${courseCode} Class Notice`, body: message, priority: 'normal', authorId: currentUser.id, postedAt: today() })
+    // Students saved before enrolments existed have no course list; treat them as enrolled in everything
+    const students = db.users.filter(u => u.role === 'student' && (!u.courses || u.courses.includes(courseCode)))
     students.forEach(s => addItem('notifications', { userId: s.id, title: `${courseCode} Class Notice`, body: message, time: 'just now', read: false, icon: 'megaphone' }))
     setMessage('')
+    setSentInfo(`Sent to ${students.length} student${students.length === 1 ? '' : 's'} enrolled in ${courseCode}.`)
   }
 
   return (
@@ -36,7 +40,10 @@ export default function AdvisoryTab() {
           <label className="label">Notice</label>
           <textarea className="input min-h-[100px]" required value={message} onChange={e => setMessage(e.target.value)} placeholder="e.g. Lab 5 report deadline extended to Sunday 11:59 PM." />
         </div>
-        <button type="submit" className="btn-primary flex items-center gap-2 text-sm"><Send size={15} /> Publish Notice</button>
+        <div className="flex items-center gap-3 flex-wrap">
+          <button type="submit" className="btn-primary flex items-center gap-2 text-sm"><Send size={15} /> Publish Notice</button>
+          {sentInfo && <span className="text-xs font-semibold text-emerald-600">{sentInfo}</span>}
+        </div>
       </form>
 
       <div>

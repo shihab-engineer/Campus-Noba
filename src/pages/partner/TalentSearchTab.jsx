@@ -4,12 +4,12 @@ import { useData } from '../../context/DataContext.jsx'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { SKILL_POOL } from '../../data/seed.js'
 import { SectionTitle, EmptyState, Badge } from '../../components/UI.jsx'
+import { today } from '../../utils/date.js'
 
 export default function TalentSearchTab() {
   const { db, addItem } = useData()
   const { currentUser } = useAuth()
   const [filters, setFilters] = useState([])
-  const [invited, setInvited] = useState([])
 
   function toggleFilter(s) {
     setFilters(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s])
@@ -18,9 +18,12 @@ export default function TalentSearchTab() {
   const students = db.users.filter(u => u.role === 'student')
   const results = filters.length === 0 ? students : students.filter(s => filters.every(f => (s.skills || []).includes(f)))
 
+  const invited = db.interviewInvites.filter(i => i.partnerId === currentUser.id).map(i => i.studentId)
+
   function invite(student) {
+    if (invited.includes(student.id)) return
+    addItem('interviewInvites', { partnerId: currentUser.id, studentId: student.id, sentAt: today() })
     addItem('notifications', { userId: student.id, title: 'Interview Invitation', body: `${currentUser.name} sent you an interview invitation via CampusNova.`, time: 'just now', read: false, icon: 'user' })
-    setInvited(prev => [...prev, student.id])
   }
 
   return (

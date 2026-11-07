@@ -4,9 +4,10 @@ import { useData } from '../../context/DataContext.jsx'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { SKILL_POOL } from '../../data/seed.js'
 import { SectionTitle, EmptyState, Badge, Modal } from '../../components/UI.jsx'
+import { today } from '../../utils/date.js'
 
 export default function JobsTab() {
-  const { db, addItem, removeItem } = useData()
+  const { db, addItem, removeItem, update } = useData()
   const { currentUser } = useAuth()
   const [showCreate, setShowCreate] = useState(false)
   const [form, setForm] = useState({ title: '', type: 'Full Time', salary: '', location: '', deadline: '', description: '', skills: [] })
@@ -17,10 +18,16 @@ export default function JobsTab() {
     setForm(f => ({ ...f, skills: f.skills.includes(s) ? f.skills.filter(x => x !== s) : [...f.skills, s] }))
   }
 
+  function deleteJob(job) {
+    if (!confirm(`Delete "${job.title}"? Its applications will also be removed.`)) return
+    removeItem('jobs', job.id)
+    update('applications', list => list.filter(a => a.jobId !== job.id))
+  }
+
   function submit(e) {
     e.preventDefault()
     if (!form.title.trim()) return
-    addItem('jobs', { ...form, partnerId: currentUser.id, applicants: 0, postedAt: new Date().toISOString().slice(0, 10) })
+    addItem('jobs', { ...form, partnerId: currentUser.id, applicants: 0, postedAt: today() })
     setShowCreate(false)
     setForm({ title: '', type: 'Full Time', salary: '', location: '', deadline: '', description: '', skills: [] })
   }
@@ -45,7 +52,7 @@ export default function JobsTab() {
                 <p className="text-xs text-slate-400 mt-1">{job.location} • Deadline {job.deadline}</p>
                 <div className="flex items-center gap-1.5 mt-2 text-xs font-semibold text-nova-600"><Users size={13} /> {applicants.length} applicants</div>
               </div>
-              <button onClick={() => removeItem('jobs', job.id)} className="w-8 h-8 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 flex items-center justify-center shrink-0"><Trash2 size={15} /></button>
+              <button onClick={() => deleteJob(job)} className="w-8 h-8 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 flex items-center justify-center shrink-0"><Trash2 size={15} /></button>
             </div>
           )
         })}

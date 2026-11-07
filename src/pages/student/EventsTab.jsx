@@ -3,6 +3,7 @@ import { CalendarDays, MapPin, Users, CheckCircle2 } from 'lucide-react'
 import { useData } from '../../context/DataContext.jsx'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { SectionTitle, EmptyState, Badge } from '../../components/UI.jsx'
+import { today, isPast } from '../../utils/date.js'
 
 export default function EventsTab() {
   const { db, addItem, patchItem } = useData()
@@ -12,8 +13,8 @@ export default function EventsTab() {
 
   function register(event) {
     const already = db.registrations.some(r => r.eventId === event.id && r.studentId === currentUser.id)
-    if (already) return
-    addItem('registrations', { eventId: event.id, studentId: currentUser.id, registeredAt: new Date().toISOString().slice(0, 10) })
+    if (already || isPast(event.date)) return
+    addItem('registrations', { eventId: event.id, studentId: currentUser.id, registeredAt: today() })
     patchItem('events', event.id, { attendees: event.attendees + 1 })
   }
 
@@ -26,6 +27,7 @@ export default function EventsTab() {
         {events.map(e => {
           const club = db.users.find(u => u.clubId === e.clubId)
           const isRegistered = db.registrations.some(r => r.eventId === e.id && r.studentId === currentUser.id)
+          const ended = isPast(e.date)
           return (
             <div key={e.id} className="card p-5">
               <div className="flex items-start justify-between gap-3 flex-wrap">
@@ -42,9 +44,9 @@ export default function EventsTab() {
               <p className="text-sm text-slate-500 mt-3 leading-relaxed">{e.description}</p>
               <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-100">
                 <span className="flex items-center gap-1.5 text-xs text-slate-500"><Users size={14} /> {e.attendees} students attending</span>
-                <button onClick={() => register(e)} disabled={isRegistered}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 ${isRegistered ? 'bg-emerald-50 text-emerald-600' : 'bg-nova-500 hover:bg-nova-600 text-white'}`}>
-                  {isRegistered ? <><CheckCircle2 size={14} /> Registered</> : 'Register Now'}
+                <button onClick={() => register(e)} disabled={isRegistered || ended}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 ${isRegistered ? 'bg-emerald-50 text-emerald-600' : ended ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-nova-500 hover:bg-nova-600 text-white'}`}>
+                  {isRegistered ? <><CheckCircle2 size={14} /> {ended ? 'Attended' : 'Registered'}</> : ended ? 'Event Ended' : 'Register Now'}
                 </button>
               </div>
             </div>

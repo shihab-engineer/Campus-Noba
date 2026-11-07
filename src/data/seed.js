@@ -2,6 +2,8 @@
 // All data lives in localStorage after first load, so the app is fully interactive
 // without needing a real backend.
 
+import { daysFromToday } from '../utils/date.js'
+
 export const COURSES = [
   { code: 'SE231', name: 'System Analysis & Design' },
   { code: 'CSE111', name: 'Object Oriented Programming' },
@@ -17,9 +19,9 @@ export const SKILL_POOL = [
 
 export const SEED_DB = {
   users: [
-    { id: 'U-STU-1', role: 'student', name: 'Abdulla Al Amin', email: 'shihab@diu.edu.bd', password: 'pass123', studentId: '242-35-815', dept: 'Software Engineering', batch: '43', cgpa: 3.72, skills: ['React', 'UI/UX', 'Figma'], avatarColor: '#f59e0b' },
-    { id: 'U-STU-2', role: 'student', name: 'Md. Mohimenul Islam', email: 'mohimenul@diu.edu.bd', password: 'pass123', studentId: '242-35-820', dept: 'Software Engineering', batch: '43', cgpa: 3.81, skills: ['PostgreSQL', 'Express', 'React', 'Node.js'], avatarColor: '#2563eb' },
-    { id: 'U-STU-3', role: 'student', name: 'Ritu Rani Saha', email: 'ritu@diu.edu.bd', password: 'pass123', studentId: '242-35-821', dept: 'Software Engineering', batch: '43', cgpa: 3.65, skills: ['Flutter', 'UI/UX', 'System Design'], avatarColor: '#db2777' },
+    { id: 'U-STU-1', role: 'student', name: 'Abdulla Al Amin', email: 'shihab@diu.edu.bd', password: 'pass123', studentId: '242-35-815', dept: 'Software Engineering', batch: '43', cgpa: 3.72, skills: ['React', 'UI/UX', 'Figma'], courses: ['SE231', 'SE322', 'CSE311'], avatarColor: '#f59e0b' },
+    { id: 'U-STU-2', role: 'student', name: 'Md. Mohimenul Islam', email: 'mohimenul@diu.edu.bd', password: 'pass123', studentId: '242-35-820', dept: 'Software Engineering', batch: '43', cgpa: 3.81, skills: ['PostgreSQL', 'Express', 'React', 'Node.js'], courses: ['SE231', 'CSE221', 'CSE311'], avatarColor: '#2563eb' },
+    { id: 'U-STU-3', role: 'student', name: 'Ritu Rani Saha', email: 'ritu@diu.edu.bd', password: 'pass123', studentId: '242-35-821', dept: 'Software Engineering', batch: '43', cgpa: 3.65, skills: ['Flutter', 'UI/UX', 'System Design'], courses: ['SE231', 'CSE111', 'CSE221'], avatarColor: '#db2777' },
     { id: 'U-FAC-1', role: 'faculty', name: 'Fatema Tuz Johora', email: 'johora@diu.edu.bd', password: 'pass123', facultyId: 'F-108', dept: 'Software Engineering', designation: 'Lecturer', avatarColor: '#0891b2' },
     { id: 'U-CLB-1', role: 'club', name: 'DIU Computer Programming Club', email: 'cpc@diu.edu.bd', password: 'pass123', clubId: 'C-01', leadContact: 'Nafis Rahman', avatarColor: '#16a34a' },
     { id: 'U-PTR-1', role: 'partner', name: 'Brain Station 23 Ltd.', email: 'hr@brainstation23.com', password: 'pass123', partnerId: 'P-01', regNum: 'BD-REG-4471', approveStatus: 'approved', avatarColor: '#9333ea' },
@@ -42,8 +44,8 @@ export const SEED_DB = {
   ],
 
   events: [
-    { id: 'E-1', title: 'DIU CampusNova Hackathon 2026 – Innovation for Smart Campus', clubId: 'C-01', category: 'Hackathon', venue: 'DIU Smart Auditorium, Knowledge Tower', date: '2026-08-20', time: '09:00 AM – 08:00 PM', description: '36-hour team hackathon focusing on student collaboration solutions, web security, and automated academic workflows. Total prize pool: 50,000 BDT!', attendees: 142, status: 'approved' },
-    { id: 'E-2', title: 'DIU Career Fair & Corporate Pitch Summit', clubId: 'C-01', category: 'Seminar', venue: 'Main Plaza, Smart Campus Ashulia', date: '2026-08-25', time: '10:00 AM – 04:00 PM', description: 'Connect directly with 30+ leading tech companies in Bangladesh. Bring your updated CampusNova portfolio.', attendees: 96, status: 'approved' },
+    { id: 'E-1', title: 'DIU CampusNova Hackathon 2026 – Innovation for Smart Campus', clubId: 'C-01', category: 'Hackathon', venue: 'DIU Smart Auditorium, Knowledge Tower', date: daysFromToday(12), time: '09:00 AM – 08:00 PM', description: '36-hour team hackathon focusing on student collaboration solutions, web security, and automated academic workflows. Total prize pool: 50,000 BDT!', attendees: 142, status: 'approved' },
+    { id: 'E-2', title: 'DIU Career Fair & Corporate Pitch Summit', clubId: 'C-01', category: 'Seminar', venue: 'Main Plaza, Smart Campus Ashulia', date: daysFromToday(20), time: '10:00 AM – 04:00 PM', description: 'Connect directly with 30+ leading tech companies in Bangladesh. Bring your updated CampusNova portfolio.', attendees: 96, status: 'approved' },
   ],
 
   registrations: [
@@ -51,11 +53,13 @@ export const SEED_DB = {
   ],
 
   jobs: [
-    { id: 'J-1', title: 'Junior React & Node.js Software Engineer', partnerId: 'U-PTR-1', type: 'Full Time', salary: '35,000 – 45,000 / month', location: 'Dhaka / Hybrid', skills: ['PostgreSQL', 'Express', 'React', 'Node.js', 'TypeScript'], description: 'We are seeking passionate DIU graduates with strong foundational knowledge in web architecture, modular code design, and REST APIs.', postedAt: '2026-07-24', deadline: '2026-09-15', applicants: 28 },
-    { id: 'J-2', title: 'Software Quality Assurance Intern', partnerId: 'U-PTR-1', type: 'Internship', salary: '18,000 – 20,000 / month', location: 'Banani, Dhaka', skills: ['Software Testing', 'JUnit', 'Selenium', 'System Analysis'], description: 'Join our QA automation team to write test scripts, run boundary analysis, and perform integration checks for enterprise web platforms.', postedAt: '2026-07-28', deadline: '2026-09-01', applicants: 14 },
+    { id: 'J-1', title: 'Junior React & Node.js Software Engineer', partnerId: 'U-PTR-1', type: 'Full Time', salary: '35,000 – 45,000 / month', location: 'Dhaka / Hybrid', skills: ['PostgreSQL', 'Express', 'React', 'Node.js', 'TypeScript'], description: 'We are seeking passionate DIU graduates with strong foundational knowledge in web architecture, modular code design, and REST APIs.', postedAt: '2026-07-24', deadline: daysFromToday(30), applicants: 28 },
+    { id: 'J-2', title: 'Software Quality Assurance Intern', partnerId: 'U-PTR-1', type: 'Internship', salary: '18,000 – 20,000 / month', location: 'Banani, Dhaka', skills: ['Software Testing', 'JUnit', 'Selenium', 'System Analysis'], description: 'Join our QA automation team to write test scripts, run boundary analysis, and perform integration checks for enterprise web platforms.', postedAt: '2026-07-28', deadline: daysFromToday(18), applicants: 14 },
   ],
 
   applications: [],
+
+  interviewInvites: [],
 
   matchRequests: [
     { id: 'MR-1', senderId: 'U-STU-2', receiverId: 'U-STU-1', courseCode: 'SE231', message: 'Hey! Want to team up for the System Analysis capstone?', status: 'pending', createdAt: '2026-08-14' },

@@ -13,6 +13,9 @@ export default {
           500: '#6440c9',
           400: '#7c5cf0',
           300: '#a58cf5',
+          200: '#d4c8fb',
+          100: '#ebe5fd',
+          50: '#f5f2fe',
         },
         brand: {
           from: '#6440c9',

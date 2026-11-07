@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Search } from 'lucide-react'
 import { useData } from '../../context/DataContext.jsx'
+import { useAuth } from '../../context/AuthContext.jsx'
 import { SectionTitle, Badge } from '../../components/UI.jsx'
 
 const ROLE_LABELS = { student: 'Student', faculty: 'Faculty', club: 'Club', partner: 'Partner', uni_admin: 'Uni Admin', sys_admin: 'Sys Admin' }
@@ -8,11 +9,13 @@ const ROLE_TONES = { student: 'blue', faculty: 'purple', club: 'green', partner:
 
 export default function UsersTab() {
   const { db, patchItem, addItem } = useData()
+  const { currentUser } = useAuth()
   const [query, setQuery] = useState('')
 
   const filtered = db.users.filter(u => u.name.toLowerCase().includes(query.toLowerCase()) || u.email.toLowerCase().includes(query.toLowerCase()))
 
   function toggleSuspend(user) {
+    if (user.id === currentUser.id) return
     const nextStatus = user.suspended ? false : true
     patchItem('users', user.id, { suspended: nextStatus })
     addItem('auditLogs', { actor: 'System Admin', action: `${nextStatus ? 'Suspended' : 'Reinstated'} account for ${user.name} (${user.id})`, time: new Date().toLocaleString() })
@@ -41,7 +44,8 @@ export default function UsersTab() {
               <div className="flex items-center gap-2 shrink-0">
                 <Badge tone={ROLE_TONES[u.role]}>{ROLE_LABELS[u.role]}</Badge>
                 {u.suspended && <Badge tone="red">Suspended</Badge>}
-                <button onClick={() => toggleSuspend(u)} className={`text-xs font-bold px-3 py-1.5 rounded-lg ${u.suspended ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-600 hover:bg-red-50 hover:text-red-600'}`}>
+                <button onClick={() => toggleSuspend(u)} disabled={u.id === currentUser.id} title={u.id === currentUser.id ? 'You cannot suspend your own account' : undefined}
+                  className={`text-xs font-bold px-3 py-1.5 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed ${u.suspended ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-600 hover:bg-red-50 hover:text-red-600'}`}>
                   {u.suspended ? 'Reinstate' : 'Suspend'}
                 </button>
               </div>

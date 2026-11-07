@@ -3,6 +3,7 @@ import { Briefcase, MapPin, Clock, CheckCircle2 } from 'lucide-react'
 import { useData } from '../../context/DataContext.jsx'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { SectionTitle, EmptyState, Badge } from '../../components/UI.jsx'
+import { today, isPast } from '../../utils/date.js'
 
 export default function CareersTab() {
   const { db, addItem, patchItem } = useData()
@@ -10,8 +11,8 @@ export default function CareersTab() {
 
   function apply(job) {
     const already = db.applications.some(a => a.jobId === job.id && a.studentId === currentUser.id)
-    if (already) return
-    addItem('applications', { jobId: job.id, studentId: currentUser.id, appliedAt: new Date().toISOString().slice(0, 10), status: 'submitted' })
+    if (already || isPast(job.deadline)) return
+    addItem('applications', { jobId: job.id, studentId: currentUser.id, appliedAt: today(), status: 'submitted' })
     patchItem('jobs', job.id, { applicants: job.applicants + 1 })
   }
 
@@ -24,6 +25,7 @@ export default function CareersTab() {
         {db.jobs.map(job => {
           const partner = db.users.find(u => u.id === job.partnerId)
           const applied = db.applications.some(a => a.jobId === job.id && a.studentId === currentUser.id)
+          const closed = isPast(job.deadline)
           const skillMatches = job.skills.filter(s => (currentUser.skills || []).includes(s)).length
           return (
             <div key={job.id} className="card p-5">
@@ -44,9 +46,9 @@ export default function CareersTab() {
                   <span className="flex items-center gap-1.5"><Clock size={13} /> Deadline {job.deadline}</span>
                   <span>{job.applicants} applicants{skillMatches > 0 ? ` • ${skillMatches} skill match${skillMatches > 1 ? 'es' : ''} with you` : ''}</span>
                 </div>
-                <button onClick={() => apply(job)} disabled={applied}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 ${applied ? 'bg-emerald-50 text-emerald-600' : 'bg-nova-500 hover:bg-nova-600 text-white'}`}>
-                  {applied ? <><CheckCircle2 size={14} /> Applied</> : 'Apply With Portfolio'}
+                <button onClick={() => apply(job)} disabled={applied || closed}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 ${applied ? 'bg-emerald-50 text-emerald-600' : closed ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-nova-500 hover:bg-nova-600 text-white'}`}>
+                  {applied ? <><CheckCircle2 size={14} /> Applied</> : closed ? 'Applications Closed' : 'Apply With Portfolio'}
                 </button>
               </div>
             </div>

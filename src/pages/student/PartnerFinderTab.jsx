@@ -4,6 +4,7 @@ import { useData } from '../../context/DataContext.jsx'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { COURSES, SKILL_POOL } from '../../data/seed.js'
 import { SectionTitle, EmptyState, Badge } from '../../components/UI.jsx'
+import { today } from '../../utils/date.js'
 
 export default function PartnerFinderTab() {
   const { db, addItem, patchItem } = useData()
@@ -20,10 +21,11 @@ export default function PartnerFinderTab() {
       .filter(u => u.role === 'student' && u.id !== currentUser.id)
       .map(u => {
         const overlap = (u.skills || []).filter(s => requiredSkills.includes(s))
-        const matchPct = requiredSkills.length ? Math.round((overlap.length / requiredSkills.length) * 100) : 60
-        return { ...u, matchPct: Math.max(matchPct, 35) }
+        // No skills selected → no score to show
+        const matchPct = requiredSkills.length ? Math.round((overlap.length / requiredSkills.length) * 100) : null
+        return { ...u, matchPct }
       })
-      .sort((a, b) => b.matchPct - a.matchPct)
+      .sort((a, b) => (b.matchPct ?? 0) - (a.matchPct ?? 0))
   }, [db.users, requiredSkills, currentUser.id])
 
   const myRequestsSent = db.matchRequests.filter(r => r.senderId === currentUser.id)
@@ -38,7 +40,7 @@ export default function PartnerFinderTab() {
       courseCode,
       message: `Hey! Want to team up for the ${courseCode} project?`,
       status: 'pending',
-      createdAt: new Date().toISOString().slice(0, 10),
+      createdAt: today(),
     })
     addItem('notifications', {
       userId: candidate.id,
@@ -119,7 +121,7 @@ export default function PartnerFinderTab() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
                     <p className="font-bold text-slate-800 truncate">{c.name}</p>
-                    <Badge tone="green">{c.matchPct}% Match</Badge>
+                    {c.matchPct !== null && <Badge tone={c.matchPct >= 50 ? 'green' : c.matchPct > 0 ? 'amber' : 'slate'}>{c.matchPct}% Match</Badge>}
                   </div>
                   <p className="text-xs text-slate-500 mt-1">{c.dept} • Batch {c.batch} • CGPA {c.cgpa}</p>
                   <div className="flex flex-wrap gap-1.5 mt-2">

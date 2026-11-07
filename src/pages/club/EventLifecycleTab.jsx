@@ -7,12 +7,18 @@ import { SectionTitle, EmptyState, Badge, Modal } from '../../components/UI.jsx'
 const CATEGORIES = ['Hackathon', 'Seminar', 'Workshop', 'Social', 'Competition']
 
 export default function EventLifecycleTab() {
-  const { db, addItem, removeItem } = useData()
+  const { db, addItem, removeItem, update } = useData()
   const { currentUser } = useAuth()
   const [showCreate, setShowCreate] = useState(false)
   const [form, setForm] = useState({ title: '', category: CATEGORIES[0], venue: '', date: '', time: '', description: '' })
 
   const myEvents = db.events.filter(e => e.clubId === currentUser.clubId).sort((a, b) => a.date.localeCompare(b.date))
+
+  function deleteEvent(event) {
+    if (!confirm(`Delete "${event.title}"? Its registrations will also be removed.`)) return
+    removeItem('events', event.id)
+    update('registrations', list => list.filter(r => r.eventId !== event.id))
+  }
 
   function submit(e) {
     e.preventDefault()
@@ -43,7 +49,7 @@ export default function EventLifecycleTab() {
                   <Badge tone="purple">{e.category}</Badge>
                   <p className="font-bold text-slate-800 mt-2">{e.title}</p>
                 </div>
-                <button onClick={() => removeItem('events', e.id)} className="w-8 h-8 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 flex items-center justify-center shrink-0"><Trash2 size={15} /></button>
+                <button onClick={() => deleteEvent(e)} className="w-8 h-8 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 flex items-center justify-center shrink-0"><Trash2 size={15} /></button>
               </div>
               <div className="flex flex-wrap gap-4 mt-3 text-sm text-slate-600">
                 <span className="flex items-center gap-1.5"><CalendarDays size={14} className="text-nova-500" /> {e.date} • {e.time}</span>

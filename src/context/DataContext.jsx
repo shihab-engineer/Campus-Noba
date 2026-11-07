@@ -7,7 +7,15 @@ const DataContext = createContext(null)
 function loadDB() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    if (raw) return JSON.parse(raw)
+    if (raw) {
+      // Add any collections that were introduced after this browser first saved data
+      const saved = JSON.parse(raw)
+      const fresh = JSON.parse(JSON.stringify(SEED_DB))
+      for (const key of Object.keys(fresh)) {
+        if (!Array.isArray(saved[key])) saved[key] = fresh[key]
+      }
+      return saved
+    }
   } catch (e) { /* fall through to seed */ }
   return JSON.parse(JSON.stringify(SEED_DB))
 }
@@ -24,7 +32,7 @@ export function DataProvider({ children }) {
   }, [])
 
   const addItem = useCallback((collection, item) => {
-    update(collection, list => [{ ...item, id: item.id || `${collection.slice(0, 3).toUpperCase()}-${Date.now()}` }, ...list])
+    update(collection, list => [{ ...item, id: item.id || `${collection.slice(0, 3).toUpperCase()}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}` }, ...list])
   }, [update])
 
   const patchItem = useCallback((collection, id, patch) => {
